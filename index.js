@@ -71,28 +71,12 @@ var modifyObj=(obj,vars,prefix)=>{
   } )
 }
 
-var wrapHandler = ( ( handler ) =>{
-  return (event,context,cb)=> {
-    modifyEnvironment()
-    .then( (res)=>{
-      var rc= handler(event,context,cb)
-      return rc
-    } )
-    .catch( (err)=>{
-      cb(null,err)
-    } );
-  }
 
-} )
-
-var wrapModule = (module)=>{
-  for(var f in module){
-    if (typeof(module[f]==="function")){
-      module[f]=wrapHandler( module[f] )
-    }
+var promiseToModifyObject = (obj,vars,prefix)=>{
+  return ()=>{
+    return modifyObj(obj,vars,prefix)
   }
 }
-
 
 
 module.exports = {
@@ -100,6 +84,5 @@ module.exports = {
   getParameter : getParameter,
   setObjVariables:setObjVariables,
   modifyObj : modifyObj,
-  wrapModule : wrapModule,
-  wrapHandler : wrapHandler
+  promiseToModifyObject : promiseToModifyObject
 };

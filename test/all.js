@@ -16,6 +16,99 @@ exports['test simple mapping'] = function(assert, done) {
   })
 }
 
+exports['test promise mapping'] = function(assert, done) {
+  const kms = require('kmsmapper')
+  const cache = require('cachedata')
+  cache.clear()
+  var obj={
+    "another_name":"local value"
+  }
+  var newValue = new Date().getTime().toString()
+  kms.putParameter("/test/","another_name",newValue).then((resp)=>{
+    console.log(resp)
+    var promise = kms.promiseToModifyObject(obj,null,"/test/")
+    promise()
+      .then((obj)=>{
+      console.log(obj)
+      assert.equal(obj["another_name"],newValue,'Parameter read from KMS')
+      done()
+    })
+  })
+}
+
+
+exports['test promise mapping lambda'] = function(assert, done) {
+  const kms = require('kmsmapper')
+  const cache = require('cachedata')
+  const lambdawrap = require('lambswool')
+  cache.clear()
+  var testmodule={
+    exports:{
+      foo : (event,context,cb) =>{
+        cb(null,"foo")
+      }
+    }
+  }
+  var obj={
+    "another_name":"local value"
+  }
+  var newValue = new Date().getTime().toString()
+  var cb = (err,res) =>{
+    if (err) {
+      console.log("ERROR",err)
+    } else {
+      console.log("OK",res)
+    }
+    assert.equal(err,null,"Expected no error")
+    assert.equal(obj["another_name"],newValue,'Parameter read from KMS')
+    done()
+  }
+
+  kms.putParameter("/test/","another_name",newValue).then((resp)=>{
+
+    console.log(resp)
+    var promise = kms.promiseToModifyObject(obj,null,"/test/")
+    lambdawrap.wrapModuleExportsWithPromise(testmodule,promise)
+    testmodule.exports.foo(null,null,cb)
+  })
+}
+
+exports['test lambda environment variables'] = function(assert, done) {
+  const kms = require('kmsmapper')
+  const cache = require('cachedata')
+  const lambdawrap = require('lambswool')
+  cache.clear()
+  var testmodule={
+    exports:{
+      foo : (event,context,cb) =>{
+        cb(null,"foo")
+      }
+    }
+  }
+  process.env["unchanged"]="unchanged"
+  process.env["changed"]="unchanged"
+
+  var newValue = new Date().getTime().toString()
+  var cb = (err,res) =>{
+    if (err) {
+      console.log("ERROR",err)
+    } else {
+      console.log("OK",res)
+    }
+    assert.equal(err,null,"Expected no error")
+    assert.equal(process.env["changed"],newValue,'Parameter read from KMS')
+    assert.equal(process.env["unchanged"],"unchanged",'Parameter unchanged')
+    done()
+  }
+
+  kms.putParameter("/test/","changed",newValue).then((resp)=>{
+    console.log(resp)
+    var promise = kms.promiseToModifyObject(process.env,null,"/test/")
+    lambdawrap.wrapModuleExportsWithPromise(testmodule,promise)
+    testmodule.exports.foo(null,null,cb)
+  })
+}
+
 exports['test cached mapping'] = function(assert, done) {
   const kms = require('kmsmapper')
   const cache = require('cachedata')
