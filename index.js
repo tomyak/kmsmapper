@@ -23,6 +23,13 @@ var getParameter=(prefix,name)=>{
     return ssm.getParameterAsync(req)
 }
 
+var deleteParameter=(prefix,name)=>{
+  let req={
+    Name: prefix + name
+  };
+  return ssm.deleteParameterAsync(req)
+}
+
 var processBatch=(keys)=>{
     let req={
       Names: keys,
@@ -82,6 +89,7 @@ var promiseToModifyObject = (obj,vars,prefix)=>{
 module.exports = {
   putParameter : putParameter,
   getParameter : getParameter,
+  deleteParameter : deleteParameter,
   setObjVariables:setObjVariables,
   modifyObj : modifyObj,
   promiseToModifyObject : promiseToModifyObject

@@ -1,6 +1,6 @@
 {
   "name": "kmsmapper",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -10,9 +10,11 @@
     "cachedata": "*",
     "lambswool": "*",
     "bluebird": "*",
-    "aws-sdk":"*"
+    "aws-sdk": "*"
   },
-  "devDependencies": { "test": ">=0.0.5" },
+  "devDependencies": {
+    "test": ">=0.0.5"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC"
