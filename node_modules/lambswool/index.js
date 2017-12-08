@@ -13,7 +13,7 @@ var wrapHandlerWithPromise = ( ( handler,promise ) =>{
 
 var wrapModuleExportsWithPromise = (module,promise)=>{
   for(var f in module.exports){
-    if (typeof(module.exports[f]==="function")){
+    if (typeof(module.exports[f])==="function"){
       module.exports[f]=wrapHandlerWithPromise(module.exports[f],promise)
     }
   }
@@ -21,7 +21,7 @@ var wrapModuleExportsWithPromise = (module,promise)=>{
 
 var wrapModuleExportsWithFunction = (module,fn)=>{
   for(var f in module.exports){
-    if (typeof(module.exports[f]==="function")){
+    if (typeof(module.exports[f])==="function"){
       module.exports[f]=fn(module.exports[f])
     }
   }
