@@ -134,5 +134,33 @@ exports['test cached mapping'] = function(assert, done) {
   })
 }
 
+exports['test put get and delete parameter'] = function (assert, done) {
+  const kms = require('../index.js')
+
+  var prefix = '/test/'
+  var key = 'deleteme'
+  var newValue = new Date().getTime().toString()
+
+  kms.putParameter(prefix, key, newValue)
+    .then((resp) => {
+      assert.notEqual(resp, null, 'put parameter ' + key)
+    })
+    .then(() => {
+      return kms.getParameter(prefix, key).then((resp) => {
+        assert.equal(resp.Parameter.Value, newValue, 'got parameter ' + key)
+      })
+    })
+    .then(() => {
+      return kms.deleteParameter(prefix, key).then((resp) => {
+        assert.notEqual(resp, null, 'deleted parameter ' + key)
+      })
+    })
+    .then(() => {
+      return kms.getParameter(prefix, key).catch((err) => {
+        assert.notEqual(err, null, key + ' is no longer available')
+        done()
+      })
+    })
+}
 
 if (module == require.main) require('test').run(exports)
